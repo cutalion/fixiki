@@ -7,9 +7,9 @@ Named after the [Fixies](https://en.wikipedia.org/wiki/Fixies_(TV_series)) — s
 ## What it does
 
 ```
-/team init                  Scaffold .ai_team/ in your repo (one-time setup)
-/team <task>                Run the team on a free-form task
-/team status                Print current state and recent log
+/fixiki:team init                  Scaffold .ai_team/ in your repo (one-time setup)
+/fixiki:team <task>                Run the team on a free-form task
+/fixiki:team status                Print current state and recent log
 ```
 
 The current Claude Code session becomes the **lead**. It reads your charter, decides which agents to dispatch, and synthesizes one coherent report back to you.
@@ -30,20 +30,19 @@ The lead orchestrates them in sequence, runs review loops (up to 2 rounds each),
 
 ## Installation
 
-Copy `.claude/` into your project root:
-
-```bash
-git clone https://github.com/cutalion/fixiki /tmp/fixiki
-cp -r /tmp/fixiki/.claude /path/to/your/project/
-```
-
-Then in a Claude Code session inside your project:
+In a Claude Code session, install the plugin from GitHub:
 
 ```
-/team init
+/plugin install https://github.com/cutalion/fixiki
 ```
 
-This scaffolds `.ai_team/charter.md` with auto-detected project name, language, test command, and lint command. Edit the charter to set your goals and authority level before running the team on a task.
+Then scaffold the team state in your project:
+
+```
+/fixiki:team init
+```
+
+This creates `.ai_team/charter.md` with auto-detected project name, language, test command, and lint command. Edit the charter to set your goals and authority level before running the team on a task.
 
 ## Charter
 
@@ -65,7 +64,7 @@ This scaffolds `.ai_team/charter.md` with auto-detected project name, language, 
 
 ## How a session works
 
-1. You run `/team add dark mode to the settings page`.
+1. You run `/fixiki:team add dark mode to the settings page`.
 2. The lead reads `.ai_team/charter.md` and the project structure.
 3. It dispatches: analyst → planner → plan-critic → engineer → code-critic → qa → writer.
 4. Each agent that returns `request-changes` triggers one re-dispatch of the upstream agent (2-round limit).

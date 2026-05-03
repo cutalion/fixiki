@@ -1,0 +1,10 @@
+{
+  "name": "fixiki",
+  "description": "Universal multi-agent engineering team — analyst, planner, plan-critic, engineer, code-critic, QA, and writer working in sequence. Run /fixiki:team <task> to ship a feature branch from a fuzzy ask.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Alexander Glushkov"
+  },
+  "repository": "https://github.com/cutalion/fixiki",
+  "license": "MIT"
+}
