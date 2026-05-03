@@ -30,10 +30,11 @@ The lead orchestrates them in sequence, runs review loops (up to 2 rounds each),
 
 ## Installation
 
-In a Claude Code session, install the plugin from GitHub:
+In a Claude Code session, add the marketplace and install the plugin:
 
 ```
-/plugin install https://github.com/cutalion/fixiki
+/plugin marketplace add cutalion/fixiki
+/plugin install fixiki@fixiki
 ```
 
 Then scaffold the team state in your project:
