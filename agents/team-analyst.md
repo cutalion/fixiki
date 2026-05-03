@@ -30,6 +30,7 @@ Write `.ai_team/specs/<kebab-slug>.md`:
 <2-4 sentences: what is broken or missing, who is affected, why it matters>
 
 ## Acceptance criteria
+<!-- At least one AC must name the user-invocation surface: the exact command, URL, or import path a user would run. E.g. "User runs `bundle exec rackup` and GET / returns HTML containing the game board" — not "GameBoard#render returns a non-empty string." -->
 - [ ] <observable, testable condition>
 - [ ] <observable, testable condition>
 
@@ -63,6 +64,7 @@ RECOMMENDATION: <"dispatch team-planner" | "stop and ask user about: <topic>" | 
 - **One spec per dispatch.** If the ask covers two unrelated things, write one spec and tell the lead "this needs to be split."
 - **Slug is kebab-case from the goal.** "Add help command to CLI" → `add-help-command-to-cli`. Cap at 60 chars.
 - **Read existing specs and log before writing.** If a near-duplicate spec exists, update it instead of creating a new one — and tell the lead.
+- **Every spec must include at least one user-invocation AC.** Name the actual command, URL, or import path a real user would invoke (the user-invocation surface). In-process tests can pass while the deliverable fails to start or wire up correctly; an AC at the invocation surface catches that gap.
 
 ## Anti-patterns (will be flagged in code review of the spec)
 
@@ -70,3 +72,4 @@ RECOMMENDATION: <"dispatch team-planner" | "stop and ask user about: <topic>" | 
 - "Implementation: change file X" — that's planner work
 - Vague problem statements that could apply to any project
 - Open questions disguised as assumptions ("Assumption: user wants Y" — if you're not sure, it's a question, not an assumption)
+- Acceptance criteria that only assert in-process or library-internal behavior — at least one AC must specify how a user invokes the deliverable end-to-end (the user-invocation surface)

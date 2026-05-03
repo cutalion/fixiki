@@ -21,11 +21,13 @@ VERDICT: <pass | fail>
 GATES RUN:
   - tests: <pass|fail|skipped: reason>
   - linter: <pass|fail|skipped: reason>
+  - smoke-invocation: <pass|fail|skipped: reason>
   - acceptance-criteria: <pass|fail>   # pass iff every spec AC has a test
   - <project-specific-agents, one row each>: <pass|fail|skipped: reason>
 FAILURES (if any, verbatim output, ≤200 lines per gate):
   --- <gate name> ---
   <output>
+  # For smoke-invocation failures: include the boot command, captured stdout/stderr, and exit code.
   --- end ---
 SUMMARY: <one-line overall>
 ```
@@ -49,6 +51,13 @@ Run gates in this order. Skip any whose preconditions aren't met. **Do not skip 
    - Python: `ruff check <changed-files>` then `mypy <changed-files>` if mypy.ini/pyproject configures it.
    - Go: `go vet ./...` then `golangci-lint run` if configured.
    - Rust: `cargo clippy -- -D warnings`.
+
+3. **Smoke-invocation.** Boot the artifact through its user-invocation surface in a fresh subprocess. Read the charter's `Definition of Done` section first — if it specifies a smoke command, use that verbatim. Otherwise apply project-shape heuristics:
+   - **Web service** — detect start command from Procfile, `package.json` `scripts.start`, or presence of sinatra/rails/rack in Gemfile. Boot it (`bundle exec rackup`, `npm start`, etc.), poll the port up to 10 s, `curl` the root, assert HTTP 2xx or 3xx. Kill the process when done.
+   - **CLI** — invoke the binary in a clean subshell, assert exit 0 and expected stdout shape.
+   - **Library** — `require`/`import` from a one-liner script in a fresh process; assert it loads without error.
+   - **Daemon / background job** — start it, send one message, assert it processes, stop it.
+   Run with a bounded warm-up window (`sleep 2` minimum, port-poll up to 10 s) before probing. Always kill the spawned PID at the end. Do **not** mount the app in-process (no `Rack::Test`-style invocation — spawn the boot command directly). Cannot be skipped silently: if genuinely no entry point exists, list it in SKIPPED with a concrete reason.
 
 ### Project-specific gates (delegate when triggers match)
 
@@ -76,6 +85,7 @@ For each acceptance criterion in the spec, point to the test that asserts it. If
 - **Don't fix anything.** You report. The lead decides whether to re-dispatch engineer.
 - **Don't skip silently.** Every gate either ran (pass/fail) or is in the SKIPPED list with a reason.
 - **Cache-aware.** If a gate is expensive (e.g., a full integration suite that takes 5 min), say so in your output but run it anyway unless the charter says skip.
+- **Smoke-invocation is the user's first-touch experience.** If the artifact doesn't boot and respond correctly through its real entry point, a green `rspec`/`pytest`/`jest` run is irrelevant — the verdict is fail.
 
 ## Anti-patterns
 
@@ -83,3 +93,4 @@ For each acceptance criterion in the spec, point to the test that asserts it. If
 - Skipping a gate because "it's probably fine."
 - Hiding linter warnings (the project may have promoted them to errors).
 - Running gates and then not reading their output (verdict must reflect actual output).
+- Reporting "tests pass" when only in-process tests ran — the artifact must boot end-to-end through its user-invocation surface in a fresh process.

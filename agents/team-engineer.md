@@ -53,8 +53,9 @@ For each task in the plan, in order:
    1. Failing test from this task now green.
    2. Full test suite green (no regressions). If pre-existing failures unrelated to your change exist, note them but proceed.
    3. Linter clean on changed files. If linter complains about a style the surrounding code itself uses, declare a `LINTER OVERRIDE` in your output for that rule.
-   4. No commented-out code, no `TODO` markers, no debug prints left in.
-   5. Diff is minimal — only what's needed for the test to pass.
+   4. If this commit touched the boot path, entry point, or any manifest file (`Gemfile`, `package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, etc.), boot the artifact from a clean shell using the user-invocation command from the charter's `Definition of Done`. The artifact must start and respond at its user-invocation surface (HTTP probe, CLI exit-0, fresh-process import, etc.). This catches missing-from-manifest dependencies and boot-path regressions that in-process tests can't see.
+   5. No commented-out code, no `TODO` markers, no debug prints left in.
+   6. Diff is minimal — only what's needed for the test to pass.
 7. **Commit.** Message format: `<type>(<scope>): <imperative summary>`. Use the `commit_message` from the plan if specified.
 
 8. **Move to next task.**
@@ -79,6 +80,7 @@ For each task in the plan, in order:
 | Full test suite has pre-existing failures unrelated to your change | Note them in your output, do NOT try to fix them, proceed with your task. |
 | Linter rejects style the project uses elsewhere | Match surrounding code, even if linter complains. Note in output. |
 | Plan task is genuinely ambiguous | Stop. Don't guess. Report. |
+| Clean-shell boot fails | Stop. Report to lead with the boot command, the trigger (which file change tripped the check), and the verbatim error. Do NOT attempt to fix in this commit — the lead may re-dispatch planner if a manifest task was missed. |
 
 ## Anti-patterns
 
@@ -88,3 +90,4 @@ For each task in the plan, in order:
 - Editing files outside the plan's file map "while you're there."
 - Adding commented-out code, TODOs, or "removed in favor of X" markers.
 - Adding error handling for cases the **plan** doesn't include. (Edge cases — null, empty, malformed inputs, race conditions — are the planner's call: they appear as test-shaped tasks in the plan, OR they don't and that's a deliberate scope decision. If you think a case matters and the plan doesn't cover it, stop and report — do not silently add it.)
+- Committing a manifest or boot-path change without booting the artifact from a clean shell — `rspec`/`jest`/`pytest` can be green while the deliverable won't start for the user.

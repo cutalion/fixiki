@@ -34,6 +34,16 @@ Look at `$ARGUMENTS`:
      - **Language:** from manifest (lockfile most authoritative).
      - **Test command:** `npm test` / `bundle exec rspec` / `pytest` / `go test ./...` / `cargo test` (whichever fits language).
      - **Lint command:** project-appropriate.
+     - **Project shape** (used to seed the Definition of Done):
+       - **Web service** → presence of `Procfile`, OR `package.json` `scripts.start`, OR a Gemfile referencing `sinatra`/`rails`/`rack`/`hanami`, OR `pyproject.toml`/`requirements.txt` referencing `flask`/`fastapi`/`django`, OR `go.mod` with a `main.go` that imports `net/http`/`gin`/`echo`. Smoke command default: the detected start command + a `curl http://localhost:<port>/` probe expecting HTTP 2xx/3xx.
+       - **CLI** → presence of a `bin/` directory with executables, OR `package.json` `bin` field, OR `pyproject.toml` `[project.scripts]`, OR `Cargo.toml` `[[bin]]`. Smoke command default: invoke the binary with `--help` (or `--version`) in a clean subshell, assert exit 0.
+       - **Library / module** (default fallback) → smoke command default: a one-liner that requires/imports the package's public entry point in a fresh process and exits cleanly.
+       - **Background job / worker** → presence of `Sidekiq`, `Resque`, `Celery`, `Bull`, etc. Smoke command default: boot the worker process, assert it stays up for N seconds without crashing.
+   - Determine `{{SMOKE_GATE_AUTODETECTED}}` from the detected project shape:
+     - Web service: `App starts via \`<start-command>\` and \`curl http://localhost:<port>/\` returns HTTP 200.`
+     - CLI: `Binary \`bin/<name> --help\` runs in a clean shell and exits 0 with usage output.`
+     - Library: `\`<interpreter> -e "require '<package>'" \` succeeds in a fresh process.`
+     - Worker: `Worker starts via \`<start-command>\` and stays up for 5s without crashing.`
    - Write `.ai_team/charter.md` with this content (substituting the placeholders):
 
      ```markdown
@@ -82,6 +92,16 @@ Look at `$ARGUMENTS`:
      - **Branch prefix:** `ai-team/`
 
      (Override any of these if auto-detection got them wrong.)
+
+     ## Definition of Done
+
+     > Every change must satisfy these gates before being declared done. Edit the smoke command — auto-detection is a starting point, not the final answer.
+
+     - **Tests pass:** `{{TEST_CMD_AUTODETECTED}}`
+     - **Linter clean:** `{{LINT_CMD_AUTODETECTED}}`
+     - **Smoke-invocation:** {{SMOKE_GATE_AUTODETECTED}}
+
+     The smoke-invocation gate boots the artifact in a fresh subprocess (clean shell — not in-process via the test runner) and exercises its user-invocation surface. This catches manifest gaps, boot-path regressions, and misconfiguration that in-process tests cannot see.
 
      ## Notes
 
@@ -142,7 +162,7 @@ Look at `$ARGUMENTS`:
      ```
 
 3. Ask the user one question: "What's the team's first goal? I'll write it into `charter.md`. (Type 'skip' to leave the placeholder.)" — incorporate the answer (or skip).
-4. Print a short summary of what was created and tell the user to review `.ai_team/charter.md` before invoking `/fixiki:team <task>`.
+4. Print a short summary of what was created and tell the user to review `.ai_team/charter.md` before invoking `/fixiki:team <task>`. Specifically call out the `Definition of Done` smoke command — auto-detection is a guess; the user should refine it to match their actual user-invocation surface before the team runs its first task.
 5. **Do not run any other agents.** Init is setup-only.
 
 ## Step 3: `status` flow
