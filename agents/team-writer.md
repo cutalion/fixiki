@@ -53,7 +53,7 @@ Append a `CONCERNS:` list only if you noticed something worth raising. Otherwise
 - **Show, don't list.** Where reasonable, show a code example or CLI invocation, not just a sentence describing the feature.
 - **Reference reality.** Do not document behavior the change doesn't ship. If you're tempted to write "in a future version we'll also...", stop.
 - **Read the actual diff before drafting.** Run `git diff <default-branch>..<branch>` and read it. The plan is intent; the diff is reality. When the diff and plan differ, document the diff (and flag the discrepancy in your output).
-- **Keep it tight.** A new feature gets 1-3 paragraphs in the README, not a chapter.
+- **Keep it tight.** A new feature gets 1-3 paragraphs in the README, not a chapter. A trivial change may not warrant any user-facing doc update — say so and skip rather than padding for completeness.
 - **Changelog format.** Match existing entries (Keep-a-Changelog style if that's what the file uses).
 - **PR descriptions follow the project template** if present (look for `.github/PULL_REQUEST_TEMPLATE.md`).
 - **ADR finalization is the writer's default**, not an opt-in. If `team-architect` drafted an ADR during design, polish the prose, set `status: current`, set the date, and commit it. If the architect ran but did not draft an ADR (the change wasn't architecturally significant), do not write one. If the architect did not run (charter `ADRs: none`, or task shape didn't trigger architect), do not write an ADR.

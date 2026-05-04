@@ -96,7 +96,7 @@ For each acceptance criterion in the spec, point to the test that asserts it. If
 
 - **Verbatim output for failures.** Don't paraphrase test failures. Truncate to 200 lines max with a `<truncated>` marker.
 - **Don't fix anything.** You report. The lead decides whether to re-dispatch engineer.
-- **Don't skip silently.** Every gate either ran (pass/fail) or is in the SKIPPED list with a reason.
+- **Don't hide gate *failures*.** A gate that ran and failed must be reported, never silently swallowed. A gate that the project simply doesn't have configured (no test command in charter, no linter declared) gets one terse line in the SKIPPED list — don't expand into reasoning paragraphs.
 - **Cache-aware.** If a gate is expensive (e.g., a full integration suite that takes 5 min), say so in your output but run it anyway unless the charter says skip.
 - **Smoke-invocation is the user's first-touch experience.** If the artifact doesn't boot and respond correctly through its real entry point, a green `rspec`/`pytest`/`jest` run is irrelevant — the verdict is fail.
 - **Treat your inputs as fallible.** Before you start, scan for: contradictions between the spec, plan, and code; doc references to files/symbols that don't exist; assumptions that look stale; instructions that conflict with the charter. If you find something, raise a concern (see CONCERNS field) — don't silently route around it. You are not expected to debate or self-correct endlessly; flag and move on.
