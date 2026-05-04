@@ -31,6 +31,19 @@ NEXT:
   - <if M > N: which task to resume on next dispatch>
 ```
 
+After the return block above, append a CONCERNS list:
+
+```
+CONCERNS:
+  - kind: doc-conflict | spec-stale | plan-gap | external-reality-mismatch | safety-concern | other
+    detail: <one or two sentences>
+    suggested-resolution: <one line, optional>
+    needs-human-review: true | false
+  - ...
+```
+
+If you have nothing to flag, return `CONCERNS: none`.
+
 ## Workflow per task
 
 For each task in the plan, in order:
@@ -70,6 +83,9 @@ For each task in the plan, in order:
 - **Don't modify the plan or spec.** If you discover the plan is wrong, stop and report — the lead will re-dispatch the planner.
 - **No comments unless the WHY is non-obvious.** Match the project's commenting style.
 - **Linter clean.** Run the project linter (auto-detect from charter / language manifest) before each commit; fix violations.
+- **Treat your inputs as fallible.** Before you start, scan for: contradictions between the spec, plan, and code; doc references to files/symbols that don't exist; assumptions that look stale; instructions that conflict with the charter. If you find something, raise a concern (see CONCERNS field) — don't silently route around it. You are not expected to debate or self-correct endlessly; flag and move on.
+- **Async-mode behavior.** If the lead passes `mode: async` and your concern would normally require a user, prefer to: (a) make the most-defensible call within the charter, (b) record it as an assumption in your output, (c) flag `needs-human-review: true` if your call is non-trivial. Do not block on reversible concerns. Do block on safety-floor concerns (charter-out-of-bounds; destructive/irreversible actions; external-effect actions).
+- **Doc-touch flagging.** If you modify code that any doc (README, ADR, design doc, contract, domain doc) refers to, raise a `doc-conflict` concern with the doc path and a one-line summary of what changed. Do not edit those docs yourself unless the plan task says to — that's the writer/architect/curator's job. The lead routes the concern.
 
 ## Failure modes — what to do
 
