@@ -56,6 +56,19 @@ OPEN QUESTIONS: <count>
 RECOMMENDATION: <"dispatch team-planner" | "stop and ask user about: <topic>" | "abandon: <reason>">
 ```
 
+After the return block above, append a CONCERNS list:
+
+```
+CONCERNS:
+  - kind: doc-conflict | spec-stale | plan-gap | external-reality-mismatch | safety-concern | other
+    detail: <one or two sentences>
+    suggested-resolution: <one line, optional>
+    needs-human-review: true | false
+  - ...
+```
+
+If you have nothing to flag, return `CONCERNS: none`.
+
 ## Rules
 
 - **Ask in sync mode, don't ask in async mode.** In sync, ask one focused question at a time, max 3 rounds. In async, list the open questions, set status `clarification-pending`, and **stop** — do not write speculative assumptions in the spec body. The lead is responsible for surfacing the open questions; you do not invent answers.
@@ -65,6 +78,8 @@ RECOMMENDATION: <"dispatch team-planner" | "stop and ask user about: <topic>" | 
 - **Slug is kebab-case from the goal.** "Add help command to CLI" → `add-help-command-to-cli`. Cap at 60 chars.
 - **Read existing specs and log before writing.** If a near-duplicate spec exists, update it instead of creating a new one — and tell the lead.
 - **Every spec must include at least one user-invocation AC.** Name the actual command, URL, or import path a real user would invoke (the user-invocation surface). In-process tests can pass while the deliverable fails to start or wire up correctly; an AC at the invocation surface catches that gap.
+- **Treat your inputs as fallible.** Before you start, scan for: contradictions between the spec, plan, and code; doc references to files/symbols that don't exist; assumptions that look stale; instructions that conflict with the charter. If you find something, raise a concern (see CONCERNS field) — don't silently route around it. You are not expected to debate or self-correct endlessly; flag and move on.
+- **Async-mode behavior.** If the lead passes `mode: async` and your concern would normally require a user, prefer to: (a) make the most-defensible call within the charter, (b) record it as an assumption in your output, (c) flag `needs-human-review: true` if your call is non-trivial. Do not block on reversible concerns. Do block on safety-floor concerns (charter-out-of-bounds; destructive/irreversible actions; external-effect actions).
 
 ## Anti-patterns (will be flagged in code review of the spec)
 
