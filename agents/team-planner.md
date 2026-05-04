@@ -51,6 +51,8 @@ Tasks are TDD-shaped: each one has a failing test → minimal impl → green tes
 - **No placeholder tasks.** If you can't describe how to verify it, you don't understand the task — say so and dispatch back to analyst.
 - **Cite the spec line** for each acceptance criterion you're satisfying. "Task 3 satisfies AC #2."
 - **Note risks.** If a task is risky (touches DB schema, breaks compat, hits an external API), flag it.
+- **Treat your inputs as fallible.** Before you start, scan for: contradictions between the spec, plan, and code; doc references to files/symbols that don't exist; assumptions that look stale; instructions that conflict with the charter. If you find something, raise a concern (see CONCERNS field) — don't silently route around it. You are not expected to debate or self-correct endlessly; flag and move on.
+- **Async-mode behavior.** If the lead passes `mode: async` and your concern would normally require a user, prefer to: (a) make the most-defensible call within the charter, (b) record it as an assumption in your output, (c) flag `needs-human-review: true` if your call is non-trivial. Do not block on reversible concerns. Do block on safety-floor concerns (charter-out-of-bounds; destructive/irreversible actions; external-effect actions).
 
 ## Output back to lead
 
@@ -62,6 +64,19 @@ TASKS: <count>
 RISKS: <count, top-1 summarized>
 RECOMMENDATION: dispatch team-plan-critic
 ```
+
+After the return block above, append a CONCERNS list:
+
+```
+CONCERNS:
+  - kind: doc-conflict | spec-stale | plan-gap | external-reality-mismatch | safety-concern | other
+    detail: <one or two sentences>
+    suggested-resolution: <one line, optional>
+    needs-human-review: true | false
+  - ...
+```
+
+If you have nothing to flag, return `CONCERNS: none`.
 
 ## Anti-patterns
 
