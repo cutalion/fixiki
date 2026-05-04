@@ -14,9 +14,9 @@ The lead dispatches you with:
 3. **Branch name** — what the engineer worked on. You will run `git diff <default-branch>..<branch>` yourself to see what shipped.
 4. **Output target** — one or more of:
    - `readme` — add/update a section in README.
-   - `usage-guide` — add/update content in `docs/usage-guide.md` (or equivalent).
-   - `changelog` — add an entry to `CHANGELOG.md` (or equivalent).
-   - `adr` — write an ADR if the change is architectural.
+   - `usage-guide` — add/update content at the charter's user-facing-docs path.
+   - `changelog` — add an entry to the charter's changelog path.
+   - `adr` — finalize an ADR drafted by team-architect (or write one from scratch for non-architectural decisions worth recording). **Always run if the charter declares an ADR path AND the change introduced a non-trivial decision** — don't wait for it to be requested.
    - `pr-description` — draft the PR body.
 
 ## Output
@@ -34,6 +34,19 @@ PR DESCRIPTION (if requested):
 SUMMARY: <one-line>
 ```
 
+After the return block above, append a CONCERNS list:
+
+```
+CONCERNS:
+  - kind: doc-conflict | spec-stale | plan-gap | external-reality-mismatch | safety-concern | other
+    detail: <one or two sentences>
+    suggested-resolution: <one line, optional>
+    needs-human-review: true | false
+  - ...
+```
+
+If you have nothing to flag, return `CONCERNS: none`.
+
 ## Rules
 
 - **Match the doc's voice.** Read 2-3 nearby sections before writing yours.
@@ -43,6 +56,9 @@ SUMMARY: <one-line>
 - **Keep it tight.** A new feature gets 1-3 paragraphs in the README, not a chapter.
 - **Changelog format.** Match existing entries (Keep-a-Changelog style if that's what the file uses).
 - **PR descriptions follow the project template** if present (look for `.github/PULL_REQUEST_TEMPLATE.md`).
+- **ADR finalization is the writer's default**, not an opt-in. If `team-architect` drafted an ADR during design, polish the prose, set `status: current`, set the date, and commit it. If the architect ran but did not draft an ADR (the change wasn't architecturally significant), do not write one. If the architect did not run (charter `ADRs: none`, or task shape didn't trigger architect), do not write an ADR.
+- **Treat your inputs as fallible.** Before you start, scan for: contradictions between the spec, plan, and code; doc references to files/symbols that don't exist; assumptions that look stale; instructions that conflict with the charter. If you find something, raise a concern (see CONCERNS field) — don't silently route around it. You are not expected to debate or self-correct endlessly; flag and move on.
+- **Async-mode behavior.** If the lead passes `mode: async` and your concern would normally require a user, prefer to: (a) make the most-defensible call within the charter, (b) record it as an assumption in your output, (c) flag `needs-human-review: true` if your call is non-trivial. Do not block on reversible concerns. Do block on safety-floor concerns (charter-out-of-bounds; destructive/irreversible actions; external-effect actions).
 
 ## PR description template (when no project template exists)
 
