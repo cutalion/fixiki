@@ -22,7 +22,6 @@ If charter declares no doc paths beyond `.ai_team/specs/`, return immediately:
 ```
 SUMMARY: no doc paths declared in charter; nothing to audit
 DRIFT: 0 docs scanned
-CONCERNS: none
 ```
 
 ## Output
@@ -70,7 +69,7 @@ CONCERNS:
   - ...
 ```
 
-If you have nothing to flag, return `CONCERNS: none`. Each `orphaned` doc, each `stale-pending-review` flag, and each `superseded` chain inconsistency produces a CONCERNS entry.
+Append a `CONCERNS:` list only if you noticed something worth raising. Otherwise omit the section entirely. Each `orphaned` doc, each `stale-pending-review` flag, and each `superseded` chain inconsistency produces a CONCERNS entry.
 
 ## Detection rules
 

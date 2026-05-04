@@ -36,7 +36,7 @@ CONCERNS:
   - ...
 ```
 
-If you have nothing to flag, return `CONCERNS: none`. ADR-contradiction findings (severity `bug`) AND safety-concern findings ALWAYS produce a CONCERNS entry in addition to the FINDINGS row.
+Append a `CONCERNS:` list only if you noticed something worth raising. Otherwise omit the section entirely. ADR-contradiction findings (severity `bug`) AND safety-concern findings ALWAYS produce a CONCERNS entry in addition to the FINDINGS row.
 
 Severity:
 - **bug** — code is broken or unsafe (correctness, security, race conditions).

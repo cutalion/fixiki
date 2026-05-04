@@ -43,7 +43,7 @@ CONCERNS:
   - ...
 ```
 
-If you have nothing to flag, return `CONCERNS: none`.
+Append a `CONCERNS:` list only if you noticed something worth raising. Otherwise omit the section entirely.
 
 ## Gate detection sequence
 
