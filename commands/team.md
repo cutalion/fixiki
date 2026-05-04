@@ -39,11 +39,18 @@ Look at `$ARGUMENTS`:
        - **CLI** → presence of a `bin/` directory with executables, OR `package.json` `bin` field, OR `pyproject.toml` `[project.scripts]`, OR `Cargo.toml` `[[bin]]`. Smoke command default: invoke the binary with `--help` (or `--version`) in a clean subshell, assert exit 0.
        - **Library / module** (default fallback) → smoke command default: a one-liner that requires/imports the package's public entry point in a fresh process and exits cleanly.
        - **Background job / worker** → presence of `Sidekiq`, `Resque`, `Celery`, `Bull`, etc. Smoke command default: boot the worker process, assert it stays up for N seconds without crashing.
+     - **Docs root:** first existing of `docs/`, `doc/`, `documentation/`. Fallback: `.ai_team/docs/`.
+     - **ADR path:** first existing of `**/adr/`, `**/decisions/`, `**/ADRs/` (anywhere in repo, but prefer one under the docs root). Fallback: `<docs-root>/adr/`.
+     - **Design path:** existing `<docs-root>/design/` if present, else `<docs-root>/design/` as the default to write to.
+     - **Contracts path:** if `openapi.yaml`, `openapi.json`, `schema.graphql`, `proto/`, `*.proto`, or `*.thrift` is present anywhere in repo, set to `<docs-root>/contracts/`. Else `none`.
+     - **Usage path:** existing `<docs-root>/usage/` if present, else empty (only `README.md` is the user-facing surface).
+     - **Changelog:** existing `CHANGELOG.md` or `CHANGELOG.rst` at repo root, else `none`.
    - Determine `{{SMOKE_GATE_AUTODETECTED}}` from the detected project shape:
      - Web service: `App starts via \`<start-command>\` and \`curl http://localhost:<port>/\` returns HTTP 200.`
      - CLI: `Binary \`bin/<name> --help\` runs in a clean shell and exits 0 with usage output.`
      - Library: `\`<interpreter> -e "require '<package>'" \` succeeds in a fresh process.`
      - Worker: `Worker starts via \`<start-command>\` and stays up for 5s without crashing.`
+   - Determine `{{DOCS_ROOT_AUTODETECTED}}`, `{{ADR_PATH_AUTODETECTED}}`, `{{DESIGN_PATH_AUTODETECTED}}`, `{{CONTRACTS_PATH_AUTODETECTED}}`, `{{CHANGELOG_PATH_AUTODETECTED}}`, `{{USAGE_PATH_SUFFIX}}` (e.g., ` plus <docs-root>/usage/` if usage path detected, else empty), and `{{USAGE_PATH_HUMAN}}` (e.g., `<docs-root>/usage/` if detected, else `(none)`) from the auto-detection above.
    - Write `.ai_team/charter.md` with this content (substituting the placeholders):
 
      ```markdown
@@ -106,6 +113,37 @@ Look at `$ARGUMENTS`:
      ## Notes
 
      (Anything else the team should know — house style, taboo refactors, hot files, weak spots in the test suite.)
+
+     ## Documentation conventions
+
+     > Where this project keeps each doc type. Auto-detected at init.
+     > If a path is `none`, the team treats that doc type as "not used in this project"
+     > and skips agents/ceremony that would produce it.
+
+     - **Docs root:** {{DOCS_ROOT_AUTODETECTED}}
+     - **ADRs:** {{ADR_PATH_AUTODETECTED}}
+     - **Design docs:** {{DESIGN_PATH_AUTODETECTED}}
+     - **API contracts:** {{CONTRACTS_PATH_AUTODETECTED}}
+     - **Domain rules:** none
+     - **User-facing docs:** README.md{{USAGE_PATH_SUFFIX}}
+     - **Changelog:** {{CHANGELOG_PATH_AUTODETECTED}}
+     - **Specs (team-internal):** .ai_team/specs/
+
+     ## Documentation governance
+
+     > Defaults — override any line below.
+
+     - ADRs are immutable + supersedable
+     - Specs are mutable while open, frozen at PR merge
+     - Design docs are versioned per feature
+     - API contracts are versioned (semver-style for breaking changes)
+     - Domain rules are living docs
+     - Code comments follow code
+     - READMEs/changelogs follow shipped behavior
+
+     ## Session mode
+
+     - **default_mode:** sync
      ```
 
    - Write `.ai_team/state.yml` with this content:
