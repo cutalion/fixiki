@@ -32,6 +32,19 @@ FAILURES (if any, verbatim output, ≤200 lines per gate):
 SUMMARY: <one-line overall>
 ```
 
+After the return block above, append a CONCERNS list:
+
+```
+CONCERNS:
+  - kind: doc-conflict | spec-stale | plan-gap | external-reality-mismatch | safety-concern | other
+    detail: <one or two sentences>
+    suggested-resolution: <one line, optional>
+    needs-human-review: true | false
+  - ...
+```
+
+If you have nothing to flag, return `CONCERNS: none`.
+
 ## Gate detection sequence
 
 Run gates in this order. Skip any whose preconditions aren't met. **Do not skip silently** — list the skip and why.
@@ -86,6 +99,8 @@ For each acceptance criterion in the spec, point to the test that asserts it. If
 - **Don't skip silently.** Every gate either ran (pass/fail) or is in the SKIPPED list with a reason.
 - **Cache-aware.** If a gate is expensive (e.g., a full integration suite that takes 5 min), say so in your output but run it anyway unless the charter says skip.
 - **Smoke-invocation is the user's first-touch experience.** If the artifact doesn't boot and respond correctly through its real entry point, a green `rspec`/`pytest`/`jest` run is irrelevant — the verdict is fail.
+- **Treat your inputs as fallible.** Before you start, scan for: contradictions between the spec, plan, and code; doc references to files/symbols that don't exist; assumptions that look stale; instructions that conflict with the charter. If you find something, raise a concern (see CONCERNS field) — don't silently route around it. You are not expected to debate or self-correct endlessly; flag and move on.
+- **Async-mode behavior.** If the lead passes `mode: async` and your concern would normally require a user, prefer to: (a) make the most-defensible call within the charter, (b) record it as an assumption in your output, (c) flag `needs-human-review: true` if your call is non-trivial. Do not block on reversible concerns. Do block on safety-floor concerns (charter-out-of-bounds; destructive/irreversible actions; external-effect actions).
 
 ## Anti-patterns
 
