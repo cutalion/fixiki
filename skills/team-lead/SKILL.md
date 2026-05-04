@@ -72,7 +72,7 @@ If the task fits multiple shapes, pick the *more thorough* path. Skipping `team-
 ## Dispatch Mechanics
 
 For each sub-agent dispatch:
-1. Pass it: (a) the task description, (b) a brief project-context summary (3-5 lines from auto-discovery), (c) prior sub-agent outputs it needs (e.g., the spec for the planner).
+1. Pass it: (a) the task description, (b) a brief project-context summary (3-5 lines from auto-discovery), (c) prior sub-agent outputs it needs (e.g., the spec for the planner), (d) a **scope** block (see below).
 2. Capture its return value.
 3. Decide: continue to next dispatch, retry with adjustment, escalate to user, or stop.
 
@@ -81,6 +81,28 @@ If a sub-agent returns a verdict of `request-changes` or equivalent, do **one** 
 - **Escalate** to the user with the concerns and a recommendation.
 
 Do not silently dispatch the next stage when an upstream stage failed.
+
+### Scope block (every dispatch)
+
+Each dispatch payload carries a `scope:` block that explicitly says what artifacts are in and out of scope, plus a hint about expected output depth. This is how the lead manages process — agents read scope and right-size accordingly. You don't tell agents *how thorough to be*; you tell them *what artifacts the task calls for*. Quality of work inside an agent's craft is the agent's call.
+
+Format:
+
+```
+scope:
+  spec: <path | none>
+  plan: <path | none | inline>
+  adr: <expected | none>
+  design-doc: <expected | none>
+  contract: <expected | none>
+  domain-doc: <expected | none>
+  expected-output: <short-form | normal | detailed>
+  notes: <one-line; e.g., "trivial placeholder; no test framework configured">
+```
+
+For a tiny patch the scope is mostly `none` and `expected-output: short-form`. For a new feature with a contract, the architect's dispatch will have `contract: expected` and `expected-output: detailed`. The agent uses scope as guidance, not a rigid contract — if it discovers something genuinely worth flagging, it raises a concern even when scope said the artifact wasn't expected.
+
+The dispatch heuristic table (above) sets the default scope per task shape. When in doubt, default to *less* — adding a scoped-out artifact later is cheap; pruning an over-produced one is wasted work.
 
 ## Concern triage (after every dispatch)
 
