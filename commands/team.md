@@ -162,6 +162,70 @@ Look at `$ARGUMENTS`:
        dispatches: 0
      ```
 
+   - Write `.ai_team/doc-conventions.md` with this content (substituting placeholders the same way as the charter):
+
+     ````markdown
+     # Documentation conventions
+
+     This file codifies the team's doc taxonomy. Agents read it to know which doc types this project uses, where they live, and how they evolve. Edit `.ai_team/charter.md` to override paths or governance — this file is generated from the charter and the universal defaults.
+
+     ## Taxonomy
+
+     | Doc type | Location (this project) | Lifecycle | Source-of-truth rule | Owner |
+     |---|---|---|---|---|
+     | ADR | {{ADR_PATH_AUTODETECTED}} | Immutable + supersedable. Body never edited after acceptance; supersession adds a new ADR with `supersedes:` and the old one gets `superseded-by:`. | Body is truth as-of write date. Code contradicting an unsuperseded ADR raises a concern from code-critic. | architect drafts during design; writer finalizes after merge |
+     | Spec | .ai_team/specs/<slug>.md | Mutable while work is open; frozen at PR merge. | While open: spec is truth, deviations require updating it in same PR. After merge: historical record. | analyst writes; engineer updates if scope shifts mid-task |
+     | Design doc | {{DESIGN_PATH_AUTODETECTED}} | Versioned per feature (v1, v2); old versions retained. | Latest version is truth for that feature. | architect |
+     | API contract | {{CONTRACTS_PATH_AUTODETECTED}} | Versioned semver-style; breaking changes bump version + add migration note. | Contract is truth for both producers and consumers. | architect drafts; engineer must bump version on breaking changes |
+     | Domain / business rules | (charter `Domain rules` path) | Living, edited continuously. | Domain doc and code must agree; either may lead but divergence is a concern. | domain-modeler maintains; engineer flags discoveries |
+     | Code comments / docstrings | inline | Follow code. | Code is truth; comment that disagrees is a bug to fix in same PR. | engineer writes; code-critic checks |
+     | README / user guide / CHANGELOG | README.md / {{USAGE_PATH_HUMAN}} / CHANGELOG.md | Follow shipped behavior, may lag merge by one writer pass. | What the user can actually do is truth. | writer |
+
+     ## Frontmatter status
+
+     ADRs, specs, design docs, and API contracts carry a `status` line in YAML frontmatter:
+
+     ```yaml
+     status: current
+     # or
+     status: superseded-by: <id>
+     # or
+     status: stale-pending-review
+     ```
+
+     Examples:
+
+     ```yaml
+     ---
+     title: Use PostgreSQL for primary store
+     status: current
+     date: 2026-05-04
+     ---
+     ```
+
+     ```yaml
+     ---
+     title: Use MySQL for primary store
+     status: superseded-by: ADR-0017
+     superseded-on: 2026-05-04
+     ---
+     ```
+
+     ## Skipped doc types
+
+     If a doc type's charter path is `none`, the team treats it as "not used in this project":
+     - The corresponding agent is not dispatched (e.g., `none` for `Domain rules` → domain-modeler skipped).
+     - Architect folds contract content into the design doc when contracts path is `none`.
+     - Curator does not scan that doc type.
+
+     ## When to update vs. when to follow
+
+     - **Engineer follows the open spec.** Deviations require updating the spec in the same PR. If the engineer believes the spec is wrong, they raise a `spec-stale` concern; the lead routes it to the analyst.
+     - **Architect and writer follow accepted ADRs.** Contradicting an unsuperseded ADR is a code-critic finding; the resolution is to write a new ADR superseding the old one.
+     - **All agents flag stale docs they encounter.** A doc that references files/symbols that no longer exist is a `doc-conflict` concern raised to the lead.
+     - **Curator marks rather than fixes.** It writes `status: stale-pending-review` and emits concerns; the lead routes the actual content fix to writer or architect.
+     ````
+
    - Write `.ai_team/README.md` with this content:
 
      ```markdown
