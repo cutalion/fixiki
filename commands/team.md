@@ -22,7 +22,11 @@ Look at `$ARGUMENTS`:
 | exactly `start` / `stop` / `run` | Print "Phase 3 — not yet shipped. See `docs/superpowers/specs/2026-05-01-ai-team-design.md` §8." and stop. |
 | matches `^LIN-\d+$` | Print "Phase 2 — Linear integration not yet shipped. Pass the issue body inline as `/fixiki:team <body>` for now." and stop. |
 | starts with `LIN-` but doesn't match `^LIN-\d+$` (e.g., empty or non-numeric) | Print "Pass a Linear issue id, e.g. `/fixiki:team LIN-123`" and stop. |
-| anything else | Treat as a free-form task. Run **task** flow (Step 4). |
+| starts with `--async ` | Treat the rest as a free-form task; pass `mode=async` to the lead. Run **task** flow (Step 4). |
+| exactly `--async` | Print "usage: /fixiki:team --async <task>" and stop. |
+| exactly `curate` | Run **curate** flow (Step 3.5). |
+| `curate <anything else>` | Print "curate takes no arguments" and stop. |
+| anything else | Treat as a free-form task; pass `mode` per Step 4 detection. Run **task** flow (Step 4). |
 
 ## Step 2: `init` flow
 
@@ -276,12 +280,23 @@ Look at `$ARGUMENTS`:
    - First 5 lines of `.ai_team/charter.md` (project name + first goal).
    - `.ai_team/state.yml` (verbatim).
    - Tail (3 most recent) of `.ai_team/log/` filenames + their first 3 lines each.
+   - **Drift summary** — dispatch `team-doc-curator` in `summary-only` mode (one-line counts, no per-doc detail). Print the returned line. If charter declares no doc paths beyond `.ai_team/specs/`, print `docs: (no doc paths declared in charter)` instead of dispatching.
 3. Stop.
+
+## Step 3.5: `curate` flow
+
+1. If `.ai_team/charter.md` doesn't exist, print "not initialized — run `/fixiki:team init` first" and stop.
+2. Load the `fixiki:team-lead` skill.
+3. Dispatch `team-doc-curator` only (no other agents). Pass it the charter's `## Documentation conventions` section.
+4. Print the curator's drift report verbatim.
+5. Write a one-line entry to `.ai_team/log/<YYYY-MM-DD>-curate.md` recording the dispatch and the headline drift counts.
+6. Stop. Do not dispatch any other agent.
 
 ## Step 4: `task` flow — become the lead
 
 1. **Load the `fixiki:team-lead` skill** by invoking it. The skill teaches you the orchestration playbook (rules, dispatch heuristic, context-loading, state, logging, synthesis).
    - If for any reason the skill cannot be loaded, refuse to proceed with the task. Tell the user.
+1.5. **Mode determination.** Before dispatching anything, the team-lead skill computes `mode` (sync | async) from: (a) `--async` flag in `$ARGUMENTS`, (b) env var `AI_TEAM_MODE`, (c) charter `## Session mode` setting (`Default mode:`), (d) inference from the user's task text. The lead announces the chosen mode. Pass `mode` into every subsequent dispatch.
 2. **Verify charter exists.** If `.ai_team/charter.md` is missing, print "run `/fixiki:team init` first" and stop.
 3. **Follow the team-lead skill's playbook** with the task = `$ARGUMENTS`.
 4. **Synthesize** results to the user per the skill's synthesis template.
@@ -292,7 +307,9 @@ Look at `$ARGUMENTS`:
 ```
 /fixiki:team init                  Scaffold .ai_team/ in this repo (one-time)
 /fixiki:team <free-form task>      Run the team on the task in sync mode
-/fixiki:team status                Print current state and recent log
+/fixiki:team --async <task>        Run the team on the task in async mode (no human in loop)
+/fixiki:team status                Print current state, recent log, and a doc drift summary
+/fixiki:team curate                Run the doc-curator only and print a drift report
 /fixiki:team help                  This message
 
 Phase 3+ (not yet shipped):  /fixiki:team start | /fixiki:team stop | /fixiki:team run
