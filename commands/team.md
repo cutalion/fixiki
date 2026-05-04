@@ -183,7 +183,7 @@ Look at `$ARGUMENTS`:
      | API contract | {{CONTRACTS_PATH_AUTODETECTED}} | Versioned semver-style; breaking changes bump version + add migration note. | Contract is truth for both producers and consumers. | architect drafts; engineer must bump version on breaking changes |
      | Domain / business rules | (charter `Domain rules` path) | Living, edited continuously. | Domain doc and code must agree; either may lead but divergence is a concern. | domain-modeler maintains; engineer flags discoveries |
      | Code comments / docstrings | inline | Follow code. | Code is truth; comment that disagrees is a bug to fix in same PR. | engineer writes; code-critic checks |
-     | README / user guide / CHANGELOG | README.md / {{USAGE_PATH_HUMAN}} / CHANGELOG.md | Follow shipped behavior, may lag merge by one writer pass. | What the user can actually do is truth. | writer |
+     | README / user guide / CHANGELOG | README.md / {{USAGE_PATH_HUMAN}} / {{CHANGELOG_PATH_AUTODETECTED}} | Follow shipped behavior, may lag merge by one writer pass. | What the user can actually do is truth. | writer |
 
      ## Frontmatter status
 
@@ -241,6 +241,7 @@ Look at `$ARGUMENTS`:
 
      - `charter.md` — **You edit this.** Goals, non-goals, authority, cadence, conventions.
      - `state.yml` — **The lead edits this.** Current focus, in-flight tasks, escalations.
+     - `doc-conventions.md` — Generated reference for the team's doc taxonomy. Edit `charter.md` to override paths or governance; this file is regenerated on `init`.
      - `log/` — One markdown file per `/fixiki:team` session. Append-only history.
      - `specs/` — Mini-specs the analyst writes for non-trivial tasks.
 
