@@ -41,9 +41,9 @@ Look at `$ARGUMENTS`:
        - **Background job / worker** → presence of `Sidekiq`, `Resque`, `Celery`, `Bull`, etc. Smoke command default: boot the worker process, assert it stays up for N seconds without crashing.
      - **Docs root:** first existing of `docs/`, `doc/`, `documentation/`. Fallback: `.ai_team/docs/`.
      - **ADR path:** first existing of `**/adr/`, `**/decisions/`, `**/ADRs/` (anywhere in repo, but prefer one under the docs root). Fallback: `<docs-root>/adr/`.
-     - **Design path:** existing `<docs-root>/design/` if present, else `<docs-root>/design/` as the default to write to.
+     - **Design path:** `<docs-root>/design/`.
      - **Contracts path:** if `openapi.yaml`, `openapi.json`, `schema.graphql`, `proto/`, `*.proto`, or `*.thrift` is present anywhere in repo, set to `<docs-root>/contracts/`. Else `none`.
-     - **Usage path:** existing `<docs-root>/usage/` if present, else empty (only `README.md` is the user-facing surface).
+     - **Usage path:** existing `<docs-root>/usage/` if present, else `none` (only `README.md` is the user-facing surface).
      - **Changelog:** existing `CHANGELOG.md` or `CHANGELOG.rst` at repo root, else `none`.
    - Determine `{{SMOKE_GATE_AUTODETECTED}}` from the detected project shape:
      - Web service: `App starts via \`<start-command>\` and \`curl http://localhost:<port>/\` returns HTTP 200.`
@@ -143,7 +143,9 @@ Look at `$ARGUMENTS`:
 
      ## Session mode
 
-     - **default_mode:** sync
+     > Controls how the team runs by default. Values: sync (lead runs in this session, asks the user) | async (lead records decisions per the team-lead skill's rules).
+
+     - **Default mode:** sync
      ```
 
    - Write `.ai_team/state.yml` with this content:
